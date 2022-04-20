@@ -1,0 +1,171 @@
+basePath: /
+host: localhost:3080
+info:
+  contact: {}
+  description: API for controlling the receipt and withdrawal of funds
+  title: Go Fiber Input
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: login user by name and password
+      operationId: Login
+      parameters:
+      - description: User name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: User password
+        in: body
+        name: pass
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: access JWT token
+          schema:
+            type: string
+        "400":
+          description: Server error
+          schema:
+            type: string
+        "401":
+          description: Bearer auth required
+          schema:
+            type: string
+      summary: login user by name and password
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: register user by name and password
+      operationId: Register
+      parameters:
+      - description: User name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: User password
+        in: body
+        name: pass
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: access JWT token
+          schema:
+            type: string
+        "400":
+          description: Server error
+          schema:
+            type: string
+        "401":
+          description: Bearer auth required
+          schema:
+            type: string
+      summary: register user by name and password
+  /transaction:
+    get:
+      consumes:
+      - application/json
+      description: get transaction by id
+      operationId: GetTransaction
+      parameters:
+      - description: Transaction id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Server error
+          schema:
+            type: string
+        "401":
+          description: Bearer auth required
+          schema:
+            type: string
+      summary: Get transaction by id
+    post:
+      consumes:
+      - application/json
+      description: get id by type transaction and amount > 0
+      operationId: transaction
+      parameters:
+      - description: Transaction amount
+        in: body
+        name: amount
+        required: true
+        schema:
+          type: number
+      - description: 1 input, 2 output
+        in: body
+        name: type
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Server error
+          schema:
+            type: string
+        "401":
+          description: Bearer auth required
+          schema:
+            type: string
+      summary: Add a new transaction to the database and change balance
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: get user by jwt auth
+      operationId: GetUser
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user
+          schema:
+            type: string
+        "400":
+          description: Server error
+          schema:
+            type: string
+        "401":
+          description: Bearer auth required
+          schema:
+            type: string
+      summary: get user by jwt auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Bearer
+    type: apiKey
+  BasicAuth:
+    type: basic
+swagger: "2.0"
