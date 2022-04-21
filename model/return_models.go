@@ -5,6 +5,11 @@ type MessageModel struct {
 	Success bool   `json:"success" example:"false"`
 }
 
+type MessageOk struct {
+	Message string `json:"message" example:"ok"`
+	Success bool   `json:"success" example:"true"`
+}
+
 type AccessTokenJWT struct {
 	Token string `json:"token"`
 }

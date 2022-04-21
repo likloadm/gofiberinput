@@ -14,6 +14,15 @@ definitions:
         example: false
         type: boolean
     type: object
+  model.MessageOk:
+    properties:
+      message:
+        example: ok
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   model.SystemUserBalance:
     properties:
       balance:
@@ -101,7 +110,7 @@ paths:
         "200":
           description: User registered
           schema:
-            $ref: '#/definitions/model.MessageModel'
+            $ref: '#/definitions/model.MessageOk'
         "400":
           description: Server error
           schema:

@@ -96,7 +96,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User registered",
                         "schema": {
-                            "$ref": "#/definitions/model.MessageModel"
+                            "$ref": "#/definitions/model.MessageOk"
                         }
                     },
                     "400": {
@@ -250,6 +250,19 @@ const docTemplate = `{
                 "success": {
                     "type": "boolean",
                     "example": false
+                }
+            }
+        },
+        "model.MessageOk": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "ok"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },

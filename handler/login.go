@@ -87,7 +87,7 @@ func Login(c *fiber.Ctx) error {
 // @Produce  json
 // @Param   name      formData   string     true  "Username"
 // @Param   pass      formData   string     true  "User password"
-// @Success 200 {object} model.MessageModel	"User registered"
+// @Success 200 {object} model.MessageOk	"User registered"
 // @Failure 400 {object} model.MessageModel "Server error"
 // @Router /register [post]
 func Register(c *fiber.Ctx) error {
