@@ -55,6 +55,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.MessageModel"
                         }
+                    },
+                    "401": {
+                        "description": "Incorrect password",
+                        "schema": {
+                            "$ref": "#/definitions/model.MessageModel"
+                        }
                     }
                 }
             }

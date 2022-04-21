@@ -32,6 +32,7 @@ func CheckPasswordHash(password, hash string) bool {
 // @Param   pass      formData   string     true  "User password"
 // @Success 200 {object} model.AccessTokenJWT	"access JWT token"
 // @Failure 400 {object} model.MessageModel "Server error"
+// @Failure 401 {object} model.MessageModel "Incorrect password"
 // @Router /login [post]
 func Login(c *fiber.Ctx) error {
 	p := new(model.SystemUser)
@@ -57,7 +58,7 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	if !CheckPasswordHash(p.Pass, user.Pass) {
-		return c.SendStatus(fiber.StatusUnauthorized)
+		return c.Status(fiber.StatusUnauthorized).JSON(model.MessageModel{Message: "error"})
 	}
 
 	claims := jwt.MapClaims{

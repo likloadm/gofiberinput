@@ -73,6 +73,10 @@ paths:
           description: Server error
           schema:
             $ref: '#/definitions/model.MessageModel'
+        "401":
+          description: Incorrect password
+          schema:
+            $ref: '#/definitions/model.MessageModel'
       summary: login user by name and password
   /register:
     post:
