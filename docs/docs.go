@@ -321,7 +321,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "127.0.0.1:3000",
 	BasePath:         "/",
-	Schemes:          []string{},
+	Schemes:          []string{"http"},
 	Title:            "Go Fiber Input",
 	Description:      "API for controlling the receipt and withdrawal of funds",
 	InfoInstanceName: "swagger",

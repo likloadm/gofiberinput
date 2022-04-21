@@ -198,6 +198,8 @@ paths:
           schema:
             $ref: '#/definitions/model.MessageModel'
       summary: get user by jwt auth
+schemes:
+- http
 securityDefinitions:
   ApiKeyAuth:
     in: header

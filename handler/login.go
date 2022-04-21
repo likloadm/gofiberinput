@@ -22,6 +22,46 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+// Register handler
+// @Summary register user by name and password
+// @Description register user by name and password
+// @ID Register
+// @Accept  json
+// @Produce  json
+// @Param   name      formData   string     true  "Username"
+// @Param   pass      formData   string     true  "User password"
+// @Success 200 {object} model.MessageModel	"User registered"
+// @Failure 400 {object} model.MessageModel "Server error"
+// @Router /register [post]
+func Register(c *fiber.Ctx) error {
+	p := new(model.SystemUser)
+
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
+	}
+
+	if p.Pass == "" || p.Name == "" {
+		log.Println("Name or pass not found")
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
+	}
+
+	PasswordHash, err := HashPassword(p.Pass)
+	if err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
+	}
+
+	_, err = database.DB.Query("INSERT INTO system_user (name, password_hash, balance) VALUES ($1, $2, $3)", p.Name, PasswordHash, 0)
+
+	if err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(model.MessageModel{Message: "ok", Success: true})
+}
+
 // Login handler
 // @Summary login user by name and password
 // @Description login user by name and password
@@ -77,44 +117,4 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(model.AccessTokenJWT{Token: t})
-}
-
-// Register handler
-// @Summary register user by name and password
-// @Description register user by name and password
-// @ID Register
-// @Accept  json
-// @Produce  json
-// @Param   name      formData   string     true  "Username"
-// @Param   pass      formData   string     true  "User password"
-// @Success 200 {object} model.MessageOk	"User registered"
-// @Failure 400 {object} model.MessageModel "Server error"
-// @Router /register [post]
-func Register(c *fiber.Ctx) error {
-	p := new(model.SystemUser)
-
-	if err := c.BodyParser(p); err != nil {
-		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
-	}
-
-	if p.Pass == "" || p.Name == "" {
-		log.Println("Name or pass not found")
-		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
-	}
-
-	PasswordHash, err := HashPassword(p.Pass)
-	if err != nil {
-		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
-	}
-
-	_, err = database.DB.Query("INSERT INTO system_user (name, password_hash, balance) VALUES ($1, $2, $3)", p.Name, PasswordHash, 0)
-
-	if err != nil {
-		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(model.MessageModel{Message: "ok", Success: true})
 }

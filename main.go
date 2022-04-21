@@ -18,7 +18,8 @@ import (
 // @description     API for controlling the receipt and withdrawal of funds
 
 // @host      127.0.0.1:3000
-// @BasePath  /
+// @BasePath /
+// @schemes http
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -56,8 +57,16 @@ func main() {
 
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(config.Config("JWT_SECRET_KEY")),
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusUnauthorized).JSON(model.MessageModel{Message: "error"})
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			// Status code defaults to 500
+			code := fiber.StatusInternalServerError
+
+			// Retrieve the custom status code if it's an fiber.*Error
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+
+			return ctx.Status(code).JSON(model.MessageModel{Message: "error"})
 		},
 	}))
 

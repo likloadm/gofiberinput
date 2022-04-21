@@ -11,7 +11,7 @@ type SystemUsers struct {
 }
 
 type SystemUserBalance struct {
-	Id      int
+	Id      int     `json:"id"`
 	Name    string  `json:"name"`
 	Pass    string  `json:"password"`
 	Balance float64 `json:"balance"`
