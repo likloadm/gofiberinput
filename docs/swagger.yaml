@@ -1,5 +1,44 @@
 basePath: /
-host: localhost:3080
+definitions:
+  model.AccessTokenJWT:
+    properties:
+      token:
+        type: string
+    type: object
+  model.MessageModel:
+    properties:
+      message:
+        example: error
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  model.SystemUserBalance:
+    properties:
+      balance:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  model.TransactionUserSystem:
+    properties:
+      amount:
+        type: number
+      id:
+        type: integer
+      sender:
+        type: integer
+      status:
+        type: integer
+      type:
+        type: integer
+    type: object
+host: 127.0.0.1:3000
 info:
   contact: {}
   description: API for controlling the receipt and withdrawal of funds
@@ -14,32 +53,26 @@ paths:
       operationId: Login
       parameters:
       - description: User name
-        in: body
+        in: formData
         name: name
         required: true
-        schema:
-          type: string
+        type: string
       - description: User password
-        in: body
+        in: formData
         name: pass
         required: true
-        schema:
-          type: string
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: access JWT token
           schema:
-            type: string
+            $ref: '#/definitions/model.AccessTokenJWT'
         "400":
           description: Server error
           schema:
-            type: string
-        "401":
-          description: Bearer auth required
-          schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
       summary: login user by name and password
   /register:
     post:
@@ -48,33 +81,27 @@ paths:
       description: register user by name and password
       operationId: Register
       parameters:
-      - description: User name
-        in: body
+      - description: Username
+        in: formData
         name: name
         required: true
-        schema:
-          type: string
+        type: string
       - description: User password
-        in: body
+        in: formData
         name: pass
         required: true
-        schema:
-          type: string
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: access JWT token
+          description: User registered
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
         "400":
           description: Server error
           schema:
-            type: string
-        "401":
-          description: Bearer auth required
-          schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
       summary: register user by name and password
   /transaction:
     get:
@@ -84,26 +111,25 @@ paths:
       operationId: GetTransaction
       parameters:
       - description: Transaction id
-        in: body
+        in: formData
         name: id
         required: true
-        schema:
-          type: integer
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: ok
           schema:
-            type: string
+            $ref: '#/definitions/model.TransactionUserSystem'
         "400":
           description: Server error
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
         "401":
           description: Bearer auth required
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
       summary: Get transaction by id
     post:
       consumes:
@@ -111,33 +137,31 @@ paths:
       description: get id by type transaction and amount > 0
       operationId: transaction
       parameters:
-      - description: Transaction amount
-        in: body
+      - description: Transaction amount(>0)
+        in: formData
         name: amount
         required: true
-        schema:
-          type: number
+        type: number
       - description: 1 input, 2 output
-        in: body
+        in: formData
         name: type
         required: true
-        schema:
-          type: integer
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: ok
           schema:
-            type: string
+            $ref: '#/definitions/model.SystemUserBalance'
         "400":
           description: Server error
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
         "401":
           description: Bearer auth required
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
       summary: Add a new transaction to the database and change balance
   /user:
     get:
@@ -155,11 +179,11 @@ paths:
         "400":
           description: Server error
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
         "401":
           description: Bearer auth required
           schema:
-            type: string
+            $ref: '#/definitions/model.MessageModel'
       summary: get user by jwt auth
 securityDefinitions:
   ApiKeyAuth:

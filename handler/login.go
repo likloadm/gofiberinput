@@ -28,11 +28,10 @@ func CheckPasswordHash(password, hash string) bool {
 // @ID Login
 // @Accept  json
 // @Produce  json
-// @Param   name      body   string     true  "User name"
-// @Param   pass      body   string     true  "User password"
-// @Success 200 {string} string	"access JWT token"
-// @Failure 400 {string} string "Server error"
-// @Failure 401 {string} string "Bearer auth required"
+// @Param   name      formData   string     true  "User name"
+// @Param   pass      formData   string     true  "User password"
+// @Success 200 {object} model.AccessTokenJWT	"access JWT token"
+// @Failure 400 {object} model.MessageModel "Server error"
 // @Router /login [post]
 func Login(c *fiber.Ctx) error {
 	p := new(model.SystemUser)
@@ -40,10 +39,7 @@ func Login(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(p); err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	row := database.DB.QueryRow("SELECT id, password_hash FROM system_user WHERE name=$1", p.Name)
@@ -52,18 +48,12 @@ func Login(c *fiber.Ctx) error {
 	switch err := row.Scan(&user.Id, &user.Pass); err {
 	case sql.ErrNoRows:
 		log.Println("No rows were returned!")
-		return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-			"success": false,
-			"message": "Unauthorized",
-		})
+		return c.Status(fiber.StatusUnauthorized).JSON(model.MessageModel{Message: "error"})
 	case nil:
 		log.Println("Rows detected")
 	default:
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	if !CheckPasswordHash(p.Pass, user.Pass) {
@@ -82,13 +72,10 @@ func Login(c *fiber.Ctx) error {
 	t, err := token.SignedString([]byte(config.Config("JWT_SECRET_KEY")))
 	if err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusInternalServerError).JSON(model.MessageModel{Message: "error"})
 	}
 
-	return c.JSON(fiber.Map{"token": t})
+	return c.JSON(model.AccessTokenJWT{Token: t})
 }
 
 // Register handler
@@ -97,52 +84,36 @@ func Login(c *fiber.Ctx) error {
 // @ID Register
 // @Accept  json
 // @Produce  json
-// @Param   name      body   string     true  "User name"
-// @Param   pass      body   string     true  "User password"
-// @Success 200 {string} string	"access JWT token"
-// @Failure 400 {string} string "Server error"
-// @Failure 401 {string} string "Bearer auth required"
+// @Param   name      formData   string     true  "Username"
+// @Param   pass      formData   string     true  "User password"
+// @Success 200 {object} model.MessageModel	"User registered"
+// @Failure 400 {object} model.MessageModel "Server error"
 // @Router /register [post]
 func Register(c *fiber.Ctx) error {
 	p := new(model.SystemUser)
 
 	if err := c.BodyParser(p); err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	if p.Pass == "" || p.Name == "" {
 		log.Println("Name or pass not found")
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "Name or pass not found",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	PasswordHash, err := HashPassword(p.Pass)
 	if err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	_, err = database.DB.Query("INSERT INTO system_user (name, password_hash, balance) VALUES ($1, $2, $3)", p.Name, PasswordHash, 0)
 
 	if err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-		"message": nil,
-	})
+	return c.Status(fiber.StatusOK).JSON(model.MessageModel{Message: "ok", Success: true})
 }

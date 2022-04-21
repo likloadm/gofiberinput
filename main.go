@@ -16,7 +16,7 @@ import (
 // @version         1.0
 // @description     API for controlling the receipt and withdrawal of funds
 
-// @host      localhost:3080
+// @host      127.0.0.1:3000
 // @BasePath  /
 
 // @securityDefinitions.basic  BasicAuth

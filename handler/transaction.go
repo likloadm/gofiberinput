@@ -36,11 +36,11 @@ func (m *ZeroAmount) Error() string {
 // @ID transaction
 // @Accept  json
 // @Produce  json
-// @Param   amount      body   float64     true  "Transaction amount"
-// @Param   type        body   int         true  "1 input, 2 output"
-// @Success 200 {string} string	"ok"
-// @Failure 400 {string} string "Server error"
-// @Failure 401 {string} string "Bearer auth required"
+// @Param   amount      formData   number     true  "Transaction amount(>0)" 100
+// @Param   type        formData   int         true  "1 input, 2 output" 1
+// @Success 200 {object} model.SystemUserBalance	"ok"
+// @Failure 400 {object} model.MessageModel "Server error"
+// @Failure 401 {object} model.MessageModel "Bearer auth required"
 // @Router /transaction [post]
 func Transaction(c *fiber.Ctx) error {
 	user := c.Locals("user").(*jwt.Token)
@@ -50,10 +50,7 @@ func Transaction(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(p); err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	modelSystemUser := model.SystemUserBalance{}
@@ -62,20 +59,14 @@ func Transaction(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	row := tx.QueryRow("SELECT balance FROM system_user WHERE id=$1", id)
 
 	if err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	// Throws Unauthorized error
@@ -84,35 +75,22 @@ func Transaction(c *fiber.Ctx) error {
 	switch err {
 	case sql.ErrNoRows:
 		log.Println("No rows were returned! Unauthorized")
-		return c.Status(fiber.StatusUnauthorized).JSON(&fiber.Map{
-			"success": false,
-			"message": "Unauthorized",
-		})
+		return c.Status(fiber.StatusUnauthorized).JSON(model.MessageModel{Message: "error"})
 	case nil:
 		log.Println("Ok")
 	default:
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	err = TransactionProcess(id, p, &modelSystemUser, tx)
 
 	if err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-		"message": "ok",
-		"id":      modelSystemUser.Id,
-	})
+	return c.Status(fiber.StatusOK).JSON(p)
 }
 
 // GetTransaction handler
@@ -121,10 +99,10 @@ func Transaction(c *fiber.Ctx) error {
 // @ID GetTransaction
 // @Accept  json
 // @Produce  json
-// @Param   id      body   int     true  "Transaction id"
-// @Success 200 {string} string	"ok"
-// @Failure 400 {string} string "Server error"
-// @Failure 401 {string} string "Bearer auth required"
+// @Param   id      formData   int     true  "Transaction id"
+// @Success 200 {object} model.TransactionUserSystem	"ok"
+// @Failure 400 {object} model.MessageModel "Server error"
+// @Failure 401 {object} model.MessageModel "Bearer auth required"
 // @Router /transaction [get]
 func GetTransaction(c *fiber.Ctx) error {
 	p := new(model.TransactionUser)
@@ -132,17 +110,11 @@ func GetTransaction(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(p); err != nil {
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	if p.Id <= 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "transaction id not found",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
 	row := database.DB.QueryRow("SELECT * FROM transaction_user WHERE id=$1", p.Id)
@@ -151,29 +123,15 @@ func GetTransaction(c *fiber.Ctx) error {
 	switch err := row.Scan(&TransactionSystemUser.Id, &TransactionSystemUser.Amount, &TransactionSystemUser.Type, &TransactionSystemUser.Status, &TransactionSystemUser.Sender); err {
 	case sql.ErrNoRows:
 		log.Println("transaction not found")
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "transaction not found",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	case nil:
 		log.Println("Ok")
 	default:
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"success": true,
-		"message": "ok",
-		"amount":  TransactionSystemUser.Amount,
-		"id":      TransactionSystemUser.Id,
-		"type":    TransactionSystemUser.Type,
-		"status":  TransactionSystemUser.Status,
-		"sender":  TransactionSystemUser.Sender,
-	})
+	return c.Status(fiber.StatusOK).JSON(TransactionSystemUser)
 }
 
 func TransactionProcess(id float64, p *model.TransactionUser, modelSystemUser *model.SystemUserBalance, tx *sql.Tx) error {
@@ -197,7 +155,7 @@ func TransactionProcess(id float64, p *model.TransactionUser, modelSystemUser *m
 		}
 		row := tx.QueryRow("INSERT INTO transaction_user (amount, type_transaction, status, sender) VALUES ($1, $2, $3, $4) RETURNING id", p.Amount, p.Type, transactionStatus, id)
 
-		switch err := row.Scan(&modelSystemUser.Id); err {
+		switch err := row.Scan(&p.Id); err {
 		case sql.ErrNoRows:
 			tx.Rollback()
 			return err
@@ -219,7 +177,7 @@ func TransactionProcess(id float64, p *model.TransactionUser, modelSystemUser *m
 		transactionStatus = 1
 
 		row := tx.QueryRow("INSERT INTO transaction_user (amount, type_transaction, status, sender) VALUES ($1, $2, $3, $4) RETURNING id", p.Amount, p.Type, transactionStatus, id)
-		switch err := row.Scan(&modelSystemUser.Id); err {
+		switch err := row.Scan(&p.Id); err {
 		case sql.ErrNoRows:
 			tx.Rollback()
 			return err

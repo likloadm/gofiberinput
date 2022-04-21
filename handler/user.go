@@ -15,9 +15,9 @@ import (
 // @ID GetUser
 // @Accept  json
 // @Produce  json
-// @Success 200 {string} string	"user"
-// @Failure 400 {string} string "Server error"
-// @Failure 401 {string} string "Bearer auth required"
+// @Success 200 {string} model.SystemUserBalance	"user"
+// @Failure 400 {object} model.MessageModel "Server error"
+// @Failure 401 {object} model.MessageModel "Bearer auth required"
 // @Router /user [get]
 func GetUser(c *fiber.Ctx) error {
 	user := c.Locals("user").(*jwt.Token)
@@ -31,23 +31,13 @@ func GetUser(c *fiber.Ctx) error {
 	switch err := row.Scan(&SystemUserBalance.Id, &SystemUserBalance.Balance, &SystemUserBalance.Name); err {
 	case sql.ErrNoRows:
 		log.Println("user not found")
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "transaction not found",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	case nil:
 		log.Println("Ok")
 	default:
 		log.Println(err)
-		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"success": false,
-			"message": "error",
-		})
+		return c.Status(fiber.StatusBadRequest).JSON(model.MessageModel{Message: "error"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"balance": SystemUserBalance.Balance,
-		"id":      SystemUserBalance.Id,
-		"name":    SystemUserBalance.Name,
-	})
+	return c.Status(fiber.StatusOK).JSON(SystemUserBalance)
 }

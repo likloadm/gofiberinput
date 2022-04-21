@@ -1,6 +1,10 @@
 package model
 
 type MessageModel struct {
-	message string `json: "message"`
-	success bool   `json: "name"`
+	Message string `json:"message" example:"error"`
+	Success bool   `json:"success" example:"false"`
+}
+
+type AccessTokenJWT struct {
+	Token string `json:"token"`
 }

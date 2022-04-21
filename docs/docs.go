@@ -29,41 +29,31 @@ const docTemplate = `{
                 "operationId": "Login",
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "User name",
                         "name": "name",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
+                        "type": "string",
                         "description": "User password",
                         "name": "pass",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "access JWT token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.AccessTokenJWT"
                         }
                     },
                     "400": {
                         "description": "Server error",
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "401": {
-                        "description": "Bearer auth required",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     }
                 }
@@ -82,41 +72,31 @@ const docTemplate = `{
                 "operationId": "Register",
                 "parameters": [
                     {
-                        "description": "User name",
+                        "type": "string",
+                        "description": "Username",
                         "name": "name",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
+                        "type": "string",
                         "description": "User password",
                         "name": "pass",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "access JWT token",
+                        "description": "User registered",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     },
                     "400": {
                         "description": "Server error",
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "401": {
-                        "description": "Bearer auth required",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     }
                 }
@@ -135,32 +115,30 @@ const docTemplate = `{
                 "operationId": "GetTransaction",
                 "parameters": [
                     {
+                        "type": "integer",
                         "description": "Transaction id",
                         "name": "id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.TransactionUserSystem"
                         }
                     },
                     "400": {
                         "description": "Server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     },
                     "401": {
                         "description": "Bearer auth required",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     }
                 }
@@ -177,41 +155,37 @@ const docTemplate = `{
                 "operationId": "transaction",
                 "parameters": [
                     {
-                        "description": "Transaction amount",
+                        "type": "number",
+                        "description": "Transaction amount(\u003e0)",
                         "name": "amount",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "number"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
+                        "type": "integer",
                         "description": "1 input, 2 output",
                         "name": "type",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.SystemUserBalance"
                         }
                     },
                     "400": {
                         "description": "Server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     },
                     "401": {
                         "description": "Bearer auth required",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     }
                 }
@@ -238,15 +212,75 @@ const docTemplate = `{
                     "400": {
                         "description": "Server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     },
                     "401": {
                         "description": "Bearer auth required",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.MessageModel"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.AccessTokenJWT": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.MessageModel": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "model.SystemUserBalance": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TransactionUserSystem": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sender": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "integer"
                 }
             }
         }
@@ -266,7 +300,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:3080",
+	Host:             "127.0.0.1:3000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Go Fiber Input",
