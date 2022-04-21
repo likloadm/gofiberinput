@@ -5,6 +5,7 @@ import (
 	"api2/database"
 	_ "api2/docs"
 	"api2/handler"
+	"api2/model"
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/gofiber/swagger"
@@ -55,6 +56,9 @@ func main() {
 
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(config.Config("JWT_SECRET_KEY")),
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusUnauthorized).JSON(model.MessageModel{Message: "error"})
+		},
 	}))
 
 	app.Post("/transaction", handler.Transaction)
