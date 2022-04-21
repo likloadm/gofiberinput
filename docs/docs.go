@@ -169,7 +169,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "1 input, 2 output",
+                        "description": "1 output, 2 input",
                         "name": "type",
                         "in": "formData",
                         "required": true

@@ -37,7 +37,7 @@ func (m *ZeroAmount) Error() string {
 // @Accept  json
 // @Produce  json
 // @Param   amount      formData   number     true  "Transaction amount(>0)" 100
-// @Param   type        formData   int         true  "1 input, 2 output" 1
+// @Param   type        formData   int         true  "1 output, 2 input" 1
 // @Success 200 {object} model.SystemUserBalance	"ok"
 // @Failure 400 {object} model.MessageModel "Server error"
 // @Failure 401 {object} model.MessageModel "Bearer auth required"
