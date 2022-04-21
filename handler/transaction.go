@@ -22,8 +22,8 @@ func (m *ZeroAmount) Error() string {
 }
 
 // type_transaction
-// 1 - Ввод
-// 2 - Вывод
+// 1 - Вывод
+// 2 - Ввод
 
 // status_transaction
 // 0 - внесена
